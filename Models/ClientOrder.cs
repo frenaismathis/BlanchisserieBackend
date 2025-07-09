@@ -1,9 +1,20 @@
 using System.ComponentModel.DataAnnotations;
+using BlanchisserieBackend.Payload;
 
 namespace BlanchisserieBackend.Models
 {
     public class ClientOrder
     {
+        public ClientOrder() { }
+
+        public ClientOrder(ClientOrderPayload clientOrderPayload)
+        {
+            TotalPrice = clientOrderPayload.TotalPrice;
+            Motif = clientOrderPayload.Motif;
+            Commentary = clientOrderPayload.Commentary;
+            UserId = clientOrderPayload.UserId;
+        }
+
         public int Id { get; set; }
 
         [Required]

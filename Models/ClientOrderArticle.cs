@@ -1,9 +1,19 @@
 using System.ComponentModel.DataAnnotations;
+using BlanchisserieBackend.Payload;
 
 namespace BlanchisserieBackend.Models
 {
     public class ClientOrderArticle
     {
+        public ClientOrderArticle() { }
+
+        public ClientOrderArticle(ClientOrderArticlePayload clientOrderArticlePayload)
+        {
+            ClientOrderId = clientOrderArticlePayload.ClientOrderId;
+            ArticleId = clientOrderArticlePayload.ArticleId;
+            Quantity = clientOrderArticlePayload.Quantity;
+        }
+
         [Required]
         public int ClientOrderId { get; set; }
 

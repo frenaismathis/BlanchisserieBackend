@@ -16,6 +16,12 @@ namespace BlanchisserieBackend.Data
         {
 
             base.OnModelCreating(modelBuilder);
+            
+            // Seed data for Roles
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Admin" },
+                new Role { Id = 2, Name = "User" }
+            );
 
             // Valeurs par défaut pour les timestamps (niveau base de données)
 
@@ -48,6 +54,13 @@ namespace BlanchisserieBackend.Data
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
             modelBuilder.Entity<User>()
                 .Property(user => user.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Role>()
+                .Property(role => role.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            modelBuilder.Entity<Role>()
+                .Property(role => role.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             // Définition de la clé composite pour la table de jointure
