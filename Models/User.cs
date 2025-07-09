@@ -1,9 +1,23 @@
 using System.ComponentModel.DataAnnotations;
+using BlanchisserieBackend.Payload;
 
 namespace BlanchisserieBackend.Models
 {
     public class User
     {
+
+        public User() { }
+
+        public User(UserPayload userPayload)
+        {
+            Firstname = userPayload.Firstname;
+            Lastname = userPayload.Lastname;
+            Email = userPayload.Email;
+            Password = userPayload.Password;
+            Civilite = userPayload.Civilite;
+            RoleId = userPayload.RoleId;
+        }
+
         public int Id { get; set; }
 
         [Required]
@@ -22,7 +36,8 @@ namespace BlanchisserieBackend.Models
         public int Civilite { get; set; }
 
         public ICollection<ClientOrder> ClientOrders { get; set; } = new List<ClientOrder>();
-
+        
+        [Required]
         public int RoleId { get; set; }
 
         public Role? Role { get; set; }

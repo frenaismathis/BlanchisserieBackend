@@ -1,9 +1,18 @@
 using System.ComponentModel.DataAnnotations;
+using BlanchisserieBackend.Payload;
 
 namespace BlanchisserieBackend.Models
 {
     public class Article
     {
+        public Article() { }
+
+        public Article(ArticlePayload articlePayload)
+        {
+            Name = articlePayload.Name;
+            Description = articlePayload.Description;
+            Price = articlePayload.Price;
+        }
         public int Id { get; set; }
 
         [Required]
