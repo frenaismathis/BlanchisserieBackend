@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using BlanchisserieBackend.Data;
 using BlanchisserieBackend.Services;
 using BlanchisserieBackend.Models;
+using BlanchisserieBackend.Mappers;
 
 namespace BlanchisserieBackend.Controllers;
 
@@ -21,7 +22,10 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginRequest.Email);
+        var user = await _context.Users
+            .Include(user => user.Role)
+            .FirstOrDefaultAsync(user => user.Email == loginRequest.Email);
+
         if (user == null)
             return Unauthorized("Invalid credentials");
 
@@ -31,7 +35,16 @@ public class AuthController : ControllerBase
             return Unauthorized("Invalid credentials");
 
         var token = _jwtTokenService.GenerateToken(user);
-        return Ok(new { token });
+
+        // Ajoute le cookie HTTP-only
+        Response.Cookies.Append("access_token", token, new CookieOptions
+        {
+            HttpOnly = true,
+            SameSite = SameSiteMode.None, // Important pour cross-origin
+            Secure = true // Obligatoire si tu es en HTTPS
+        });
+
+        return Ok(new { user = UserMapper.ToUserDto(user) });
     }
 
 }
