@@ -11,8 +11,6 @@ namespace BlanchisserieBackend.Mappers
             {
                 Id = role.Id,
                 Name = role.Name,
-                CreatedAt = role.CreatedAt,
-                UpdatedAt = role.UpdatedAt,
             };
         }
     }

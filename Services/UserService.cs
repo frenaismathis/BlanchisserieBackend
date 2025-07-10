@@ -26,20 +26,24 @@ namespace BlanchisserieBackend.Services
         public async Task<User> CreateAsync(UserPayload userPayload)
         {
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(userPayload.Password);
-            var user = new User(userPayload)
-            {
-                Password = passwordHash
-            };
-            var createdUser = _context.Users.Add(user);
+            userPayload.Password = passwordHash;
+
+            var user = new User(userPayload);
+            _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return createdUser.Entity;
+
+            var createdUser = await _context.Users
+                .Include(userDb => userDb.Role)
+                .FirstOrDefaultAsync(userDb => userDb.Id == user.Id);
+
+            return createdUser!;
         }
 
         public async Task<bool> UpdateAsync(int id, UserPayload userPayload)
         {
             var user = await _context.Users.FindAsync(id);
             if (user is null) return false;
-            
+
             user.Firstname = userPayload.Firstname;
             user.Lastname = userPayload.Lastname;
             user.Email = userPayload.Email;

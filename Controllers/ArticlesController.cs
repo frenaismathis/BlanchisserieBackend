@@ -3,11 +3,13 @@ using BlanchisserieBackend.Services;
 using BlanchisserieBackend.Mappers;
 using BlanchisserieBackend.Payload;
 using BlanchisserieBackend.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlanchisserieBackend.Controllers;
 
 [ApiController]
 [Route("api/articles")]
+[Authorize]
 public class ArticlesController : ControllerBase
 {
     private readonly ArticleService _articleService;

@@ -3,11 +3,13 @@ using BlanchisserieBackend.Services;
 using BlanchisserieBackend.Payload;
 using BlanchisserieBackend.DTOs;
 using BlanchisserieBackend.Mappers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlanchisserieBackend.Controllers;
 
 [ApiController]
 [Route("api/clientOrderArticles")]
+[Authorize]
 public class ClientOrderArticlesController : ControllerBase
 {
     private readonly ClientOrderArticleService _service;
@@ -32,9 +34,9 @@ public class ClientOrderArticlesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ClientOrderArticleDto>> Post(ClientOrderArticlePayload clientOrderArticlePayload)
+    public async Task<ActionResult<ClientOrderArticleDto>> Post(ClientOrderArticleCreatePayload clientOrderArticleCreatePayload)
     {
-        var createdClientOrderArticle = await _service.CreateAsync(clientOrderArticlePayload);
+        var createdClientOrderArticle = await _service.CreateAsync(clientOrderArticleCreatePayload);
         return CreatedAtAction(nameof(Get), new
         {
             clientOrderId = createdClientOrderArticle.ClientOrderId,
@@ -43,9 +45,9 @@ public class ClientOrderArticlesController : ControllerBase
     }
 
     [HttpPut("{clientOrderId}/{articleId}")]
-    public async Task<IActionResult> Put(int clientOrderId, int articleId, ClientOrderArticlePayload clientOrderArticlePayload)
+    public async Task<IActionResult> Put(int clientOrderId, int articleId, ClientOrderArticleUpdatePayload clientOrderArticleUpdatePayload)
     {
-        var updatedClientOrderArticle = await _service.UpdateAsync(clientOrderId, articleId, clientOrderArticlePayload);
+        var updatedClientOrderArticle = await _service.UpdateAsync(clientOrderId, articleId, clientOrderArticleUpdatePayload);
         if (!updatedClientOrderArticle) return BadRequest();
         return NoContent();
     }

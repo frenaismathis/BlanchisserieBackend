@@ -3,6 +3,7 @@ using BlanchisserieBackend.Services;
 using BlanchisserieBackend.Mappers;
 using BlanchisserieBackend.DTOs;
 using BlanchisserieBackend.Payload;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlanchisserieBackend.Controllers;
 

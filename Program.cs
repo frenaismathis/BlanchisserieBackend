@@ -2,10 +2,38 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using BlanchisserieBackend.Data;
 using BlanchisserieBackend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using NSwag.Generation.Processors.Security;
 
 // Chargement des variables d'environnement
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Configuration JWT
+var jwtKey = Env.GetString("JWT_SECRET");
+var jwtIssuer = Env.GetString("JWT_ISSUER");
+builder.Services.AddSingleton<IJwtTokenService>(new JwtTokenService(jwtKey, jwtIssuer));
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
 
 var dbHost = Env.GetString("DB_HOST");
 var dbPort = Env.GetString("DB_PORT");
@@ -35,6 +63,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
     config.Title = "Blanchisserie API";
+    config.OperationProcessors.Add(new OperationSecurityScopeProcessor("apiKey"));
+    config.DocumentProcessors.Add(new SecurityDefinitionAppender("apiKey", new NSwag.OpenApiSecurityScheme()
+    {
+        Type = NSwag.OpenApiSecuritySchemeType.ApiKey,
+        Name = "Authorization",
+        In = NSwag.OpenApiSecurityApiKeyLocation.Header,
+        Description = "Bearer token"
+    }));
 });
 
 var app = builder.Build();
@@ -46,5 +82,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
