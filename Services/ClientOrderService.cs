@@ -29,9 +29,15 @@ namespace BlanchisserieBackend.Services
 
         public async Task<ClientOrder> CreateAsync(ClientOrderPayload clientOrderPayload)
         {
-            var createdClientOrder = _context.ClientOrders.Add(new ClientOrder(clientOrderPayload));
+            var clientOrder = new ClientOrder(clientOrderPayload);
+            _context.ClientOrders.Add(clientOrder);
             await _context.SaveChangesAsync();
-            return createdClientOrder.Entity;
+
+            var createdClientOrder = await _context.ClientOrders
+                .Include(clientOrderDb => clientOrderDb.User)
+                .FirstOrDefaultAsync(clientOrderDb => clientOrderDb.Id == clientOrder.Id);
+
+            return createdClientOrder!;
         }
 
         public async Task<bool> UpdateAsync(int id, ClientOrderPayload clientOrderPayload)

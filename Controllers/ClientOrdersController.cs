@@ -3,11 +3,13 @@ using BlanchisserieBackend.Services;
 using BlanchisserieBackend.DTOs;
 using BlanchisserieBackend.Mappers;
 using BlanchisserieBackend.Payload;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlanchisserieBackend.Controllers;
 
 [ApiController]
 [Route("api/clientOrders")]
+[Authorize]
 public class ClientOrdersController : ControllerBase
 {
     private readonly ClientOrderService _service;

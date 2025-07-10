@@ -25,23 +25,24 @@ namespace BlanchisserieBackend.Services
                 .FirstOrDefaultAsync(clientOrderArticle => clientOrderArticle.ClientOrderId == clientOrderId && clientOrderArticle.ArticleId == articleId);
         }
 
-        public async Task<ClientOrderArticle> CreateAsync(ClientOrderArticlePayload clientOrderArticlePayload)
+        public async Task<ClientOrderArticle> CreateAsync(ClientOrderArticleCreatePayload clientOrderArticleCreatePayload)
         {
-            var createdClientOrderArticle = _context.ClientOrderArticles.Add(new ClientOrderArticle(clientOrderArticlePayload));
-            await _context.SaveChangesAsync();
+            var clientOrderArticle = new ClientOrderArticle(clientOrderArticleCreatePayload);
+
+            _context.ClientOrderArticles.Add(clientOrderArticle);
+            await _context.SaveChangesAsync();  
+            
             return (await _context.ClientOrderArticles
                 .Include(clientOrderArticle => clientOrderArticle.Article)
-                .FirstOrDefaultAsync(clientOrderArticle => clientOrderArticle.ClientOrderId == clientOrderArticle.ClientOrderId && clientOrderArticle.ArticleId == clientOrderArticle.ArticleId))!;
+                .FirstOrDefaultAsync(clientOrderArticleDb => clientOrderArticleDb.ClientOrderId == clientOrderArticle.ClientOrderId && clientOrderArticleDb.ArticleId == clientOrderArticle.ArticleId))!;
         }
 
-        public async Task<bool> UpdateAsync(int clientOrderId, int articleId, ClientOrderArticlePayload clientOrderArticlePayload)
+        public async Task<bool> UpdateAsync(int clientOrderId, int articleId, ClientOrderArticleUpdatePayload clientOrderArticleUpdatePayload)
         {
             var clientOrderArticle = await _context.ClientOrderArticles.FindAsync(clientOrderId, articleId);
             if (clientOrderArticle is null) return false;
 
-            clientOrderArticle.ClientOrderId = clientOrderArticlePayload.ClientOrderId;
-            clientOrderArticle.ArticleId = clientOrderArticlePayload.ArticleId;
-            clientOrderArticle.Quantity = clientOrderArticlePayload.Quantity;
+            clientOrderArticle.Quantity = clientOrderArticleUpdatePayload.Quantity;
             clientOrderArticle.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

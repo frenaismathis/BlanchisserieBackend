@@ -7,6 +7,6 @@ namespace BlanchisserieBackend.DTOs
         public string? Email { get; set; }
         public int Civilite { get; set; }
         public int RoleId { get; set; }
-        public RoleDto Role { get; set; } = new RoleDto();
+        public RoleDto? Role { get; set; }
     }
 }

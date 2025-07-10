@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BlanchisserieBackend.Payload
 {
-    public class ClientOrderArticlePayload
+    public class ClientOrderArticleCreatePayload
     {
         [Required]
         public int ClientOrderId { get; set; }

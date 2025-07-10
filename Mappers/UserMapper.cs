@@ -14,7 +14,11 @@ namespace BlanchisserieBackend.Mappers
                 Email = user.Email,
                 Civilite = user.Civilite,
                 RoleId = user.RoleId,
-                Role = user.Role != null ? RoleMapper.ToRoleDto(user.Role) : new RoleDto()
+                Role = user.Role == null ? null : new RoleDto
+                {
+                    Id = user.Role.Id,
+                    Name = user.Role.Name
+                }
             };
         }
     }
