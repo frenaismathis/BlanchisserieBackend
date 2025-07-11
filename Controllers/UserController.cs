@@ -37,11 +37,6 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UserDto>> Post(UserPayload userPayload)
     {
-        // Hash the password before saving
-        if (!string.IsNullOrWhiteSpace(userPayload.Password))
-        {
-            userPayload.Password = BCrypt.Net.BCrypt.HashPassword(userPayload.Password);
-        }
         var createdUser = await _service.CreateAsync(userPayload);
         return CreatedAtAction(nameof(Get), new { id = createdUser.Id }, UserMapper.ToUserDto(createdUser));
     }
