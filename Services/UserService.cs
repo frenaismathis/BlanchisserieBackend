@@ -25,10 +25,9 @@ namespace BlanchisserieBackend.Services
 
         public async Task<User> CreateAsync(UserPayload userPayload)
         {
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(userPayload.Password);
-            userPayload.Password = passwordHash;
 
             var user = new User(userPayload);
+            user.Password = BCrypt.Net.BCrypt.HashPassword(userPayload.Password);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
