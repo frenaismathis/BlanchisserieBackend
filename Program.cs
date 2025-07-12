@@ -11,7 +11,6 @@ using NSwag.Generation.Processors.Security;
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Configuration JWT
 var jwtKey = Env.GetString("JWT_SECRET");
 var jwtIssuer = Env.GetString("JWT_ISSUER");
@@ -32,6 +31,18 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtIssuer,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+    // Ajout pour lire le token depuis le cookie "access_token"
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.ContainsKey("access_token"))
+            {
+                context.Token = context.Request.Cookies["access_token"];
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -63,6 +74,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
     config.Title = "Blanchisserie API";
+    config.Description = "⚠️ L'authentification réelle utilise un cookie HTTP-only nommé 'access_token'.\n" +
+                         "Swagger utilise le header Authorization uniquement pour les tests locaux. " +
+                         "Pour tester l'authentification via cookie, utilisez un client HTTP (Postman, navigateur, etc.).";
     config.OperationProcessors.Add(new OperationSecurityScopeProcessor("apiKey"));
     config.DocumentProcessors.Add(new SecurityDefinitionAppender("apiKey", new NSwag.OpenApiSecurityScheme()
     {
@@ -83,6 +97,9 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+var startup = new Startup(builder.Configuration);
+startup.ConfigureServices(builder.Services); 
 
 var app = builder.Build();
 
