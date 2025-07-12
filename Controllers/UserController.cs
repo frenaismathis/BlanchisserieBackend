@@ -4,11 +4,13 @@ using BlanchisserieBackend.Mappers;
 using BlanchisserieBackend.DTOs;
 using BlanchisserieBackend.Payload;
 using Microsoft.AspNetCore.Authorization;
+using BlanchisserieBackend.Models;
 
 namespace BlanchisserieBackend.Controllers;
 
 [ApiController]
 [Route("api/users")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly UserService _service;
@@ -24,15 +26,13 @@ public class UsersController : ControllerBase
         return userList.Select(UserMapper.ToUserDto).ToList();
     }
 
-
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserDto>> Get(int id)
+    public async Task<ActionResult<User>> Get(int id)
     {
         var user = await _service.GetByIdAsync(id);
         if (user is null) return NotFound();
-        return Ok(UserMapper.ToUserDto(user));
+        return Ok(user);
     }
-
 
     [HttpPost]
     public async Task<ActionResult<UserDto>> Post(UserPayload userPayload)

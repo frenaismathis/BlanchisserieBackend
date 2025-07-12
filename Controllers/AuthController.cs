@@ -4,6 +4,8 @@ using BlanchisserieBackend.Data;
 using BlanchisserieBackend.Services;
 using BlanchisserieBackend.Models;
 using BlanchisserieBackend.Mappers;
+using Microsoft.AspNetCore.Authorization;
+using BlanchisserieBackend.DTOs;
 
 namespace BlanchisserieBackend.Controllers;
 
@@ -20,7 +22,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+    public async Task<IActionResult> Login(LoginRequest loginRequest)
     {
         var user = await _context.Users
             .Include(user => user.Role)
@@ -45,6 +47,39 @@ public class AuthController : ControllerBase
         });
 
         return Ok(new { user = UserMapper.ToUserDto(user) });
+    }
+
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<ActionResult<UserDto>> Me()
+    {
+        // Récupère l'ID utilisateur depuis le token JWT, NameIdentifier = identifiant unique
+        var userIdClaim = User.FindFirst("id") ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null)
+            return Unauthorized();
+
+        // Vérifie si l'ID extrait du token JWT est un entier
+        if (!int.TryParse(userIdClaim.Value, out var userId))
+            return Unauthorized();
+
+        // Charge l'utilisateur avec son rôle
+        var user = await _context.Users
+            .Include(user => user.Role)
+            .FirstOrDefaultAsync(user => user.Id == userId);
+
+        if (user == null)
+            return Unauthorized();
+
+        return Ok(new { user = UserMapper.ToUserDto(user) });
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public IActionResult Logout()
+    {
+        // Supprime le cookie HTTP-only
+        Response.Cookies.Delete("access_token");
+        return Ok(new { message = "Logged out successfully" });
     }
 
 }
