@@ -55,4 +55,21 @@ public class ClientOrdersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("user/{userId}")]
+    public async Task<ActionResult<IEnumerable<ClientOrderDto>>> GetClientOrdersByUserId(int userId)
+    {
+        var clientOrders = await _service.GetByUserIdAsync(userId);
+        return clientOrders.Select(ClientOrderMapper.ToClientOrderDto).ToList();
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<ClientOrderDto>> UpdateOrderStatus(int id, [FromBody] UpdateClientOrderStatusPayload payload)
+    {
+        var updatedOrder = await _service.UpdateOrderStatusAndReturnAsync(id, payload.Status);
+        if (updatedOrder == null) return NotFound();
+        return Ok(ClientOrderMapper.ToClientOrderDto(updatedOrder));
+    }
+
 }

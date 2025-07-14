@@ -16,15 +16,18 @@ namespace BlanchisserieBackend.Data
         {
 
             base.OnModelCreating(modelBuilder);
-            
+
             // Seed data for Roles
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "Admin" },
                 new Role { Id = 2, Name = "User" }
             );
 
-            // Valeurs par défaut pour les timestamps (niveau base de données)
+            // Default values for timestamps (database level)
 
+            modelBuilder.Entity<ClientOrder>()
+                .Property(clientOrder => clientOrder.OrderDate)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
             modelBuilder.Entity<ClientOrder>()
                 .Property(clientOrder => clientOrder.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -63,42 +66,47 @@ namespace BlanchisserieBackend.Data
                 .Property(role => role.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            // Définition de la clé composite pour la table de jointure
+            // Composite key definition for the join table
             modelBuilder.Entity<ClientOrderArticle>()
                 .HasKey(clientOrderArticle => new { clientOrderArticle.ClientOrderId, clientOrderArticle.ArticleId });
 
-            // Relation ClientOrder → User
+            // Relationship ClientOrder → User
             modelBuilder.Entity<ClientOrder>()
                 .HasOne(clientOrder => clientOrder.User)
                 .WithMany(user => user.ClientOrders)
                 .HasForeignKey(clientOrder => clientOrder.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Relation ClientOrderArticle → ClientOrder
+            // Relationship ClientOrderArticle → ClientOrder
             modelBuilder.Entity<ClientOrderArticle>()
                 .HasOne(clientOrderArticle => clientOrderArticle.ClientOrder)
                 .WithMany(clientOrder => clientOrder.ClientOrderArticles)
                 .HasForeignKey(clientOrderArticle => clientOrderArticle.ClientOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Relation ClientOrderArticle → Article
+            // Relationship ClientOrderArticle → Article
             modelBuilder.Entity<ClientOrderArticle>()
                 .HasOne(clientOrderArticle => clientOrderArticle.Article)
                 .WithMany() // Pas de navigation inverse côté Article (choix assumé)
                 .HasForeignKey(clientOrderArticle => clientOrderArticle.ArticleId)
                 .OnDelete(DeleteBehavior.Cascade);
-                
-            // Relation User → Role
+
+            // Relationship User → Role
             modelBuilder.Entity<User>()
                 .HasOne(user => user.Role)
                 .WithMany(role => role.Users)
                 .HasForeignKey(user => user.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Contraintes uniques
+            // Unique constraint on User Email
             modelBuilder.Entity<User>()
                 .HasIndex(user => user.Email)
                 .IsUnique();
+            
+            // Default value for ClientOrder status
+            modelBuilder.Entity<ClientOrder>()
+            .Property(co => co.Status)
+            .HasDefaultValue(ClientOrderStatus.PendingValidation);
         }
     }
 }

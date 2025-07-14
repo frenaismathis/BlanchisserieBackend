@@ -1,5 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using BlanchisserieBackend.Payload;
+public enum ClientOrderStatus
+{
+    PendingValidation = 0,
+    Validated = 1,
+    Rejected = 2,
+    Delivered = 3
+}
 
 namespace BlanchisserieBackend.Models
 {
@@ -24,6 +31,10 @@ namespace BlanchisserieBackend.Models
 
         public string? Commentary { get; set; }
 
+        public ClientOrderStatus Status { get; set; } = ClientOrderStatus.PendingValidation;
+
+        public DateTime OrderDate { get; set; }
+
         [Required]
         public int UserId { get; set; }
 
@@ -33,6 +44,6 @@ namespace BlanchisserieBackend.Models
 
         public DateTime CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }  
+        public DateTime UpdatedAt { get; set; }
     }
 }

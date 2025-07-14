@@ -46,7 +46,7 @@ public class AuthController : ControllerBase
             Secure = true // Obligatoire si tu es en HTTPS
         });
 
-        return Ok(new { user = UserMapper.ToUserDto(user) });
+        return Ok(UserMapper.ToUserDto(user));
     }
 
     [HttpGet("me")]
@@ -70,7 +70,7 @@ public class AuthController : ControllerBase
         if (user == null)
             return Unauthorized();
 
-        return Ok(new { user = UserMapper.ToUserDto(user) });
+        return Ok(UserMapper.ToUserDto(user));
     }
 
     [HttpPost("logout")]

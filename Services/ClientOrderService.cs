@@ -33,8 +33,17 @@ namespace BlanchisserieBackend.Services
             _context.ClientOrders.Add(clientOrder);
             await _context.SaveChangesAsync();
 
+            foreach (var articlePayload in clientOrderPayload.ClientOrderArticles)
+            {
+                var clientOrderArticle = new ClientOrderArticle(articlePayload, clientOrder.Id);
+                _context.ClientOrderArticles.Add(clientOrderArticle);
+            }
+            await _context.SaveChangesAsync();
+
             var createdClientOrder = await _context.ClientOrders
                 .Include(clientOrderDb => clientOrderDb.User)
+                .Include(clientOrderDb => clientOrderDb.ClientOrderArticles)
+                    .ThenInclude(clientOrderArticle => clientOrderArticle.Article)
                 .FirstOrDefaultAsync(clientOrderDb => clientOrderDb.Id == clientOrder.Id);
 
             return createdClientOrder!;
@@ -63,5 +72,32 @@ namespace BlanchisserieBackend.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+       public async Task<List<ClientOrder>> GetByUserIdAsync(int userId)
+        {
+            return await _context.ClientOrders
+                .Where(clientOrder => clientOrder.UserId == userId)
+                .Include(clientOrder => clientOrder.User)
+                .Include(clientOrder => clientOrder.ClientOrderArticles)
+                    .ThenInclude(clientOrderArticle => clientOrderArticle.Article)
+                .ToListAsync();
+        }
+
+        public async Task<ClientOrder?> UpdateOrderStatusAndReturnAsync(int orderId, int status)
+        {
+            var order = await _context.ClientOrders
+                .Include(co => co.User)
+                .Include(co => co.ClientOrderArticles)
+                    .ThenInclude(ca => ca.Article)
+                .FirstOrDefaultAsync(co => co.Id == orderId);
+
+            if (order == null) return null;
+
+            order.Status = (ClientOrderStatus)status;
+            order.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return order;
+        }
+
     }
 }
