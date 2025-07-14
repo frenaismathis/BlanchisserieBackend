@@ -5,11 +5,10 @@ namespace BlanchisserieBackend.Models
 {
     public class ClientOrderArticle
     {
-        public ClientOrderArticle() { }
-
-        public ClientOrderArticle(ClientOrderArticleCreatePayload clientOrderArticlePayload)
+        public ClientOrderArticle(){}
+        public ClientOrderArticle(ClientOrderArticleCreatePayload clientOrderArticlePayload, int? clientOrderId = null)
         {
-            ClientOrderId = clientOrderArticlePayload.ClientOrderId;
+            ClientOrderId = clientOrderId ?? clientOrderArticlePayload.ClientOrderId;
             ArticleId = clientOrderArticlePayload.ArticleId;
             Quantity = clientOrderArticlePayload.Quantity;
         }

@@ -11,10 +11,12 @@ namespace BlanchisserieBackend.Mappers
             {
                 Id = clientOrder.Id,
                 TotalPrice = clientOrder.TotalPrice,
+                OrderDate = clientOrder.OrderDate,
                 Motif = clientOrder.Motif,
                 Commentary = clientOrder.Commentary,
                 UserId = clientOrder.UserId,
                 Username = clientOrder.User == null ? null : clientOrder.User.Firstname + " " + clientOrder.User.Lastname,
+                Status = clientOrder.Status,
                 ClientOrderArticles = clientOrder.ClientOrderArticles?.Select(clientOrderArticle => new ClientOrderArticleDto
                 {
                     ClientOrderId = clientOrderArticle.ClientOrderId,
