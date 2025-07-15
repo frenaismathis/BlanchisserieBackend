@@ -22,11 +22,6 @@ namespace BlanchisserieBackend.Services
                 .ToListAsync();
         }
 
-        public async Task<ClientOrder?> GetByIdAsync(int id)
-        {
-            return await _context.ClientOrders.Include(clientOrder => clientOrder.User).FirstOrDefaultAsync(clientOrder => clientOrder.Id == id);
-        }
-
         public async Task<ClientOrder> CreateAsync(ClientOrderPayload clientOrderPayload)
         {
             var clientOrder = new ClientOrder(clientOrderPayload);
@@ -49,31 +44,7 @@ namespace BlanchisserieBackend.Services
             return createdClientOrder!;
         }
 
-        public async Task<bool> UpdateAsync(int id, ClientOrderPayload clientOrderPayload)
-        {
-            var clientOrder = await _context.ClientOrders.FindAsync(id);
-            if (clientOrder is null) return false;
-
-            clientOrder.TotalPrice = clientOrderPayload.TotalPrice;
-            clientOrder.UserId = clientOrderPayload.UserId;
-            clientOrder.Motif = clientOrderPayload.Motif;
-            clientOrder.Commentary = clientOrderPayload.Commentary;
-            clientOrder.UpdatedAt = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var clientOrder = await _context.ClientOrders.FindAsync(id);
-            if (clientOrder is null) return false;
-            _context.ClientOrders.Remove(clientOrder);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-       public async Task<List<ClientOrder>> GetByUserIdAsync(int userId)
+        public async Task<List<ClientOrder>> GetByUserIdAsync(int userId)
         {
             return await _context.ClientOrders
                 .Where(clientOrder => clientOrder.UserId == userId)
@@ -86,10 +57,10 @@ namespace BlanchisserieBackend.Services
         public async Task<ClientOrder?> UpdateOrderStatusAndReturnAsync(int orderId, int status)
         {
             var order = await _context.ClientOrders
-                .Include(co => co.User)
-                .Include(co => co.ClientOrderArticles)
-                    .ThenInclude(ca => ca.Article)
-                .FirstOrDefaultAsync(co => co.Id == orderId);
+                .Include(clientOrder => clientOrder.User)
+                .Include(clientOrder => clientOrder.ClientOrderArticles)
+                    .ThenInclude(clientOrderArticle => clientOrderArticle.Article)
+                .FirstOrDefaultAsync(clientOrder => clientOrder.Id == orderId);
 
             if (order == null) return null;
 

@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using BlanchisserieBackend.Services;
-using BlanchisserieBackend.Mappers;
-using BlanchisserieBackend.Payload;
 using BlanchisserieBackend.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
 
 namespace BlanchisserieBackend.Controllers;
 
@@ -13,46 +12,18 @@ namespace BlanchisserieBackend.Controllers;
 public class ArticlesController : ControllerBase
 {
     private readonly ArticleService _articleService;
-    public ArticlesController(ArticleService articleService)
+    private readonly IMapper _mapper;
+    public ArticlesController(ArticleService articleService, IMapper mapper)
     {
         _articleService = articleService;
+        _mapper = mapper;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ArticleDto>>> Get()
     {
         var articles = await _articleService.GetAllAsync();
-        return Ok(articles.Select(ArticleMapper.ToArticleDto));
+        return Ok(_mapper.Map<IEnumerable<ArticleDto>>(articles));
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ArticleDto>> Get(int id)
-    {
-        var article = await _articleService.GetByIdAsync(id);
-        if (article is null) return NotFound();
-        return Ok(ArticleMapper.ToArticleDto(article));
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<ArticleDto>> Post(ArticlePayload articlePayload)
-    {
-        var createdArticle = await _articleService.CreateAsync(articlePayload);
-        return CreatedAtAction(nameof(Get), new { id = createdArticle.Id }, ArticleMapper.ToArticleDto(createdArticle));
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, ArticlePayload articlePayload)
-    {
-        var updatedArticle = await _articleService.UpdateAsync(id, articlePayload);
-        if (!updatedArticle) return BadRequest();
-        return NoContent();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var deletedArticle = await _articleService.DeleteAsync(id);
-        if (!deletedArticle) return NotFound();
-        return NoContent();
-    }
 }

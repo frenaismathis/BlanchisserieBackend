@@ -15,6 +15,6 @@ namespace BlanchisserieBackend.Payload
         public int UserId { get; set; }
 
         [Required]
-        public ICollection<ClientOrderArticleCreatePayload> ClientOrderArticles { get; set; } = new List<ClientOrderArticleCreatePayload>();
+        public ICollection<ClientOrderArticlePayload> ClientOrderArticles { get; set; } = new List<ClientOrderArticlePayload>();
     }
 }

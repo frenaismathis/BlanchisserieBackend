@@ -7,11 +7,11 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NSwag.Generation.Processors.Security;
 
-// Chargement des variables d'environnement
+// Load environment variables
 Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuration JWT
+// JWT configuration
 var jwtKey = Env.GetString("JWT_SECRET");
 var jwtIssuer = Env.GetString("JWT_ISSUER");
 builder.Services.AddSingleton<IJwtTokenService>(new JwtTokenService(jwtKey, jwtIssuer));
@@ -32,7 +32,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
-    // Ajout pour lire le token depuis le cookie "access_token"
+    // Add logic to read the token from the "access_token" cookie
     options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
@@ -52,31 +52,30 @@ var dbName = Env.GetString("DB_NAME");
 var dbUser = Env.GetString("DB_USER");
 var dbPassword = Env.GetString("DB_PASSWORD");
 
-// Chaine de caractère pour la connexion à PostgreSQL
+// Connection string for PostgreSQL
 var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username={dbUser};Password={dbPassword}";
 
-
-// Ajout du context de PostgreSQL pour Entity Framework Core
+// Add PostgreSQL context for Entity Framework Core
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Injection des services métier
+// Dependency injection for business services
 builder.Services.AddScoped<ArticleService>();
-builder.Services.AddScoped<ClientOrderArticleService>();
 builder.Services.AddScoped<ClientOrderService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddControllers();
 
-// Configuration pour Swagger via NSwag
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Swagger configuration via NSwag
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiDocument(config =>
 {
     config.Title = "Blanchisserie API";
-    config.Description = "⚠️ L'authentification réelle utilise un cookie HTTP-only nommé 'access_token'.\n" +
-                         "Swagger utilise le header Authorization uniquement pour les tests locaux. " +
-                         "Pour tester l'authentification via cookie, utilisez un client HTTP (Postman, navigateur, etc.).";
+    config.Description = "⚠️ Real authentication uses an HTTP-only cookie named 'access_token'.\n" +
+                         "Swagger uses the Authorization header only for local tests. " +
+                         "To test authentication via cookie, use an HTTP client (Postman, browser, etc.).";
     config.OperationProcessors.Add(new OperationSecurityScopeProcessor("apiKey"));
     config.DocumentProcessors.Add(new SecurityDefinitionAppender("apiKey", new NSwag.OpenApiSecurityScheme()
     {
@@ -109,6 +108,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUi();
 }
 
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();

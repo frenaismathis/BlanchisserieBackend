@@ -12,5 +12,8 @@ namespace BlanchisserieBackend.Payload
 
         [Required]
         public decimal Price { get; set; }
+
+        [Required]
+        public string ImagePath { get; set; } = string.Empty;
     }
 }

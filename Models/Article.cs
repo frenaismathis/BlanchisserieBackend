@@ -12,6 +12,7 @@ namespace BlanchisserieBackend.Models
             Name = articlePayload.Name;
             Description = articlePayload.Description;
             Price = articlePayload.Price;
+            ImagePath = articlePayload.ImagePath;
         }
         public int Id { get; set; }
 
@@ -23,6 +24,9 @@ namespace BlanchisserieBackend.Models
 
         [Required]
         public decimal Price { get; set; }
+
+        [Required]
+        public string ImagePath { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; }
 

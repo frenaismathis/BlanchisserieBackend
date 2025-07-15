@@ -1,23 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using BlanchisserieBackend.Payload;
 
 namespace BlanchisserieBackend.Models
 {
     public class User
     {
-
-        public User() { }
-
-        public User(UserPayload userPayload)
-        {
-            Firstname = userPayload.Firstname;
-            Lastname = userPayload.Lastname;
-            Email = userPayload.Email;
-            Password = userPayload.Password;
-            Civilite = userPayload.Civilite;
-            RoleId = userPayload.RoleId;
-        }
-
         public int Id { get; set; }
 
         [Required]
