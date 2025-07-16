@@ -14,7 +14,7 @@ This is the backend API for a laundry management application, built with ASP.NET
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
 - [PostgreSQL](https://www.postgresql.org/download/)
 - [Node.js](https://nodejs.org/) (if you want to run the Angular frontend)
 - [Git](https://git-scm.com/)
