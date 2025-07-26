@@ -81,7 +81,7 @@ namespace BlanchisserieBackend.Data
             // Relationship ClientOrderArticle → Article
             modelBuilder.Entity<ClientOrderArticle>()
                 .HasOne(clientOrderArticle => clientOrderArticle.Article)
-                .WithMany() // Pas de navigation inverse côté Article (choix assumé)
+                .WithMany()
                 .HasForeignKey(clientOrderArticle => clientOrderArticle.ArticleId)
                 .OnDelete(DeleteBehavior.Cascade);
 
