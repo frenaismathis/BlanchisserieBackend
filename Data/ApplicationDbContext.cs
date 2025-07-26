@@ -146,7 +146,7 @@ namespace BlanchisserieBackend.Data
             );
 
 
-            // Seed data for ClientOrderArticles (nombre d'articles variable)
+            // Seed data for ClientOrderArticles
             modelBuilder.Entity<ClientOrderArticle>().HasData(
                 // Order 1 (2 articles)
                 new ClientOrderArticle { ClientOrderId = 1, ArticleId = 1, Quantity = 2 },
