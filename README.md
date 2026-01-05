@@ -1,6 +1,11 @@
 # BlanchisserieBackend
 
-This is the backend API for a laundry management application, built with ASP.NET Core and Entity Framework Core.
+ASP.NET Core Backend for a Fullstack Laundry Management Web Project, Close to Professional Contexts
+
+## Description
+
+REST API for managing users, orders, and items.
+Implements JWT authentication and role-based access control (Admin/User), with a modular and testable architecture, easily integrated with an Angular frontend.
 
 ## Features
 
